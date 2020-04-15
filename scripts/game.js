@@ -24,8 +24,13 @@
     let renderZones=[];
     let xZones=[];
     let finalScore=0;
+    let upKey=localStorage.getItem('upKey');
+    let leftKey=localStorage.getItem('leftKey');
+    let rightKey=localStorage.getItem('rightKey');
+    let downKey=localStorage.getItem('downKey');
     let furthestPointReached= canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2);
     window.addEventListener('keydown', onKeyDownDefault);
+    window.addEventListener('keydown', onKeyDown);
 
     let timeBar = createBox({
         left: canvas.width/2+50,
@@ -670,6 +675,32 @@
     function handleWin() {
         finalScore+=2*timeLeft;
         finalScore+=1000;
+        // setHighScores();
+    }
+    function setHighScores() {
+        let scores=[];
+        let highScore1=localStorage.getItem('froggerHighScore1');
+        let highScore2=localStorage.getItem('froggerHighScore2');
+        let highScore3=localStorage.getItem('froggerHighScore3');
+        let highScore4=localStorage.getItem('froggerHighScore4');
+        let highScore5=localStorage.getItem('froggerHighScore5');
+        console.log("were here");
+        scores.push(finalScore);
+        scores.push(highScore1);
+        scores.push(highScore2);
+        scores.push(highScore3);
+        scores.push(highScore4);
+        scores.push(highScore5);
+        scores.sort(function(a, b) {
+            return b - a;
+        });
+        window.localStorage.setItem('froggerHighScore1', scores[0]);
+        window.localStorage.setItem('froggerHighScore2', scores[1]);
+        window.localStorage.setItem('froggerHighScore3', scores[2]);
+        window.localStorage.setItem('froggerHighScore4', scores[3]);
+        window.localStorage.setItem('froggerHighScore5', scores[4]);
+        console.log("And here too");
+
     }
 
     function checkWin(){
@@ -677,6 +708,7 @@
             gameOver=true;
             gameWon=true;
             handleWin();
+            setHighScores();
         }
         if (frog.center.y<canvas.height/MAPSIZE){
             let found=false;
@@ -737,9 +769,9 @@
             frog.horizontalMovementToGo-=verticalMovement;
         }
         ////TODO put all this ^^ in its own thing
-        checkCarCollisions();
-        checkTurtleCollsions(elapsedTime);
-        checkLogCollisions(elapsedTime);
+        // checkCarCollisions();
+        // checkTurtleCollsions(elapsedTime);
+        // checkLogCollisions(elapsedTime);
         updateCar(elapsedTime);
         updateLogs(elapsedTime);
         updateTurtles(elapsedTime);
@@ -831,6 +863,41 @@
             }
         }
     }
+
+    function onKeyDown(e) {
+        if(!gameOver&&gameReady) {
+            if (e.key === leftKey) { //left
+                frog.direction = 3;
+                frogRender.setIndex(1);
+                frog.horizontalMovementToGo -= canvas.height / MAPSIZE
+                frog.rotation = Math.PI / 2;
+            } else if (e.key === upKey) { //up
+                frog.verticalMovementToGo -= canvas.height / MAPSIZE;
+                frog.direction = 1;
+                frogRender.setIndex(1);
+                frog.rotation = Math.PI;
+                console.log(furthestPointReached);
+                console.log(frog.center.y - canvas.height / MAPSIZE);
+                if (frog.center.y - canvas.height / MAPSIZE < furthestPointReached) {
+                    finalScore += 10;
+                }
+            } else if (e.key === rightKey) {//right
+                frog.direction = 4;
+                frogRender.setIndex(1);
+                frog.horizontalMovementToGo += canvas.height / MAPSIZE;
+                frog.rotation = -Math.PI / 2;
+            }
+                else if (e.key===downKey) { //down
+                // if (frog.direction!=1) {
+                frog.verticalMovementToGo += canvas.height / MAPSIZE;
+                // }
+                frog.rotation = 0;
+                frogRender.setIndex(1);
+                frog.direction = 2;
+            }
+            }
+        }
+
 
     function renderMaze() {
         for (let row = 0; row < MAPSIZE-2; row++) {

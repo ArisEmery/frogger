@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang = "en-US">
+<head>
+    <meta charset = "UTF-8">
+    <title>Lunar Lander</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+<body>
+<h1 id = "title">Configure Controls</h1>
+<!--<form1 id = "form1">-->
+<div id="controls">
+    <input id = "up" class="control" type="text" value="w" placeholder="Up Key">Up</input>
+    <input id = "down" class="control" type="text" value="s" placeholder="Down Key">Down</input>
+    <input id = "left" class="control" type="text" value="a">Left</input>
+    <input id = "right" class="control" type="text" value="d">Right</input>
+</div>
+<!--<a onclick="Controls.setControls()" href="Controls.setControls()" class="options">Submit</a>-->
+
+<button id ="submitButton" onclick="Controls.setControls()">Submit</button>
+
+
+<script src = "scripts/controls.js"></script>
+
+
+<!--<a href="index.html" >Back</a>-->
+
+<form action="index.html" id="back">
+    <input type="submit" value="Back" />
+</form>
+
+
+
+</body>

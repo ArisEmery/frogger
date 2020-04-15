@@ -46,6 +46,7 @@ body {
 #controls{
     color: white;
     text-align: center;
+    /*width: 15%;*/
 }
 .scores{
     text-align: center;
