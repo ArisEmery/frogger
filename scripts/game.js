@@ -10,13 +10,31 @@
     let context = canvas.getContext("2d");
     let lastTimeStamp = performance.now();
     let gameOver=false;
+    let gameWon=false;
     let gameReady=true;
     let numLives=3;
     let cars = [];
     let logs = [];
     let turtles = [];
     let turtleRenders=[];
+    let landingZones =[];
+    let done =false;
+    let popped=false;
+    let timeLeft=60;
+    let renderZones=[];
+    let xZones=[];
+    let finalScore=0;
+    let furthestPointReached= canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2);
     window.addEventListener('keydown', onKeyDownDefault);
+
+    let timeBar = createBox({
+        left: canvas.width/2+50,
+        top: canvas.height-canvas.height/MAPSIZE*1.5,
+        width: 200,
+        height: 25,
+        rotationRate: 2 * Math.PI / 10000,   // rate in ms
+        fillStyle: 'rgba(0, 255, 0, 1)'
+    });
 
     let imgGrass = new Image();
     imgGrass.isReady = false;
@@ -126,6 +144,7 @@
         direction: 1,  //1 is up, 2 is down, 3 is left, for is right
         moveRate: .5,
         rotateRate: Math.PI / 1000,
+        swimTime: 1000
         // type: 1
     };
 
@@ -137,22 +156,6 @@
         type: 0,
     }, graphics);
 
-    let turtleRender = new AnimatedModel({
-        spriteSheet: 'assets/turtle-sprite.png',
-        spriteCount: 2,
-        spriteTime: [200,200],
-        type: 1,
-    }, graphics);
-
-    let turtle={
-        size: { x: canvas.width/MAPSIZE*.75, y: canvas.height/MAPSIZE*.75 },     //size of cropped image
-        speed: .1,
-        center: { x: canvas.width/2, y:canvas.height - (canvas.height / MAPSIZE * 13)},
-        rotation: Math.PI,
-        rotateRate: Math.PI / 1000,
-
-    };
-
     function turtleshell(speed,center,type) {
         this.speed=speed;
         this.center=center;
@@ -160,9 +163,7 @@
         this.size = { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE };   //size of cropped image
         this.rotation= -Math.PI;
         this.rotateRate= Math.PI / 1000;
-
     }
-
 
     function car(img,speed,length,x,y){
         this.img = img;
@@ -178,6 +179,15 @@
         this.length=length;
         this.x=x;
         this.y=y;
+    }
+
+    function createBox(spec) {
+        spec.center = {
+            x: spec.left + spec.width / 2,
+            y: spec.top + spec.height / 2
+        };
+        spec.orientation = 0;
+        return spec;
     }
 
    //todo every few second pop the last few car off the list (as many as spawn in those seconds)
@@ -196,9 +206,57 @@
             }
         }
     }
+    function checkTurtleCollsions(elapsedTime) {
+        for (let i=0;i<turtles.length;i++){
+            //TODO make this only work on the road to optimize
+            if (Math.abs(turtles[i].center.y-frog.center.y)<(canvas.height/MAPSIZE)-39){
+                let theirRadius=canvas.width/MAPSIZE/2;
+                if (Math.abs(frog.center.x-turtles[i].center.x)<(canvas.width/MAPSIZE)-10){
+                    if (turtles[i].type!=1) {
+                        frog.center.x += turtles[i].speed * elapsedTime;
+                        frog.swimTime=1000;
+                    }else{
+                        if (turtleRenders[i].getIndex()<8){
+                            frog.center.x += turtles[i].speed * elapsedTime;
+                            frog.swimTime=1000;
+                        }{
+                            frog.swimTime-=elapsedTime;
+                        }
+                    }
+                }else{
+                    frog.swimTime-=elapsedTime;
+                }
+                if (frog.swimTime<0){
+                    handleCollisions();
+                }
+
+            }
+        }
+    }
+    function checkLogCollisions(elapsedTime){
+        for (let i=0;i<logs.length;i++){
+            //TODO make this only work on the road to optimize
+            if (logs[i].y+20===frog.center.y){
+                let theirRadius=logs[i].length/2;
+                let minimumDistance=frog.radius+theirRadius-10;
+                let carCollionX=5+logs[i].x+(logs[i].length/2);
+                if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
+                    frog.center.x += logs[i].speed * elapsedTime;
+                    frog.swimTime=1000;
+                }else{
+                    frog.swimTime-=elapsedTime;
+                }
+                if (frog.swimTime<0){
+                    handleCollisions();
+                }
+            }
+        }
+    }
     function handleCollisions() {
         frog.center.x=(canvas.width/2);
-        frog.center.y=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)
+        frog.center.y=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2);
+        frog.swimTime=1000;
+        timeLeft=60;
         if(numLives>0){
             numLives--;
         }else{
@@ -207,7 +265,7 @@
     }
     function updateTurtles(elapsedTime) {
         let timer = performance.now()%5000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let myRand = Random.nextRange(1,5);
             if (myRand===1) {
                 let center = {
@@ -350,7 +408,7 @@
             }
         }
         timer = performance.now()%4000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let myRand = Random.nextRange(1,5);
             if (myRand===1) {
                 let center = {
@@ -496,24 +554,24 @@
             turtleRenders[i].update(elapsedTime);
             turtles[i].center.x+= elapsedTime*turtles[i].speed;
         }
-        if (turtles.length>=20){
+        if (turtles.length>=30){
             turtles.splice(0, 5);
         }
     }
 
     function updateLogs(elapsedTime){
         let timer = performance.now()%3000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newLog = new log(smallLog, .05, 60, -65, canvas.height - (canvas.height / MAPSIZE * 11))
             logs.push(newLog);
         }
         timer = performance.now()%5000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newLog = new log(largeLog, .08, 120, -125, canvas.height - (canvas.height / MAPSIZE * 12))
             logs.push(newLog);
         }
         timer = performance.now()%4000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newLog = new log(mediumLog, .05, 90, -95, canvas.height - (canvas.height / MAPSIZE * 14))
             logs.push(newLog);
         }
@@ -529,7 +587,7 @@
     function updateCar(elapsedTime){
         let myRand = Random.nextRange(1,4);
         let timer = performance.now()%5000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let myImg=yellowCar;
             if (myRand===2){
                 myImg=stripedCar;
@@ -541,12 +599,12 @@
             cars.push(newCar);
         }
         timer = performance.now()%5500;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newCar = new car(truck, -.05, 120, canvas.width+45, canvas.height - (canvas.height / MAPSIZE * 5))
             cars.push(newCar);
         }
         timer = performance.now()%1500;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let myImg=yellowCar;
             if (myRand===2){
                 myImg=stripedCar;
@@ -558,12 +616,12 @@
             cars.push(newCar);
         }
         timer = performance.now()%5000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newCar = new car(fireTruck, .07, 90, -200, canvas.height - (canvas.height / MAPSIZE * 7))
             cars.push(newCar);
         }
         timer = performance.now()%5000;
-        if (timer>0&&timer<21) {
+        if (timer>0&&timer<15) {
             let newCar = new car(truck2, .07, 120, -45, canvas.height - (canvas.height / MAPSIZE * 8))
             cars.push(newCar);
         }
@@ -592,15 +650,64 @@
     }
     function renderTurtles() {
         for (let i=0;i<turtles.length;i++){
-            console.log(turtles[i]);
             turtleRenders[i].render(turtles[i])
         }
     }
+    function renderBox(box) {
+        context.save();
+        context.translate(box.center.x, box.center.y);
+        context.rotate(box.orientation);
+        context.translate(-box.center.x, -box.center.y);
 
-    function processInput(elapsedTime) {
+        context.fillStyle = box.fillStyle;
+        context.fillRect(box.center.x - box.width / 2, box.center.y - box.height / 2, box.width, box.height);
+
+        context.strokeStyle = 'rgb(0, 0, 0)';
+        context.strokeRect(box.center.x - box.width / 2, box.center.y - box.height / 2, box.width, box.height);
+
+        context.restore();
+    }
+    function handleWin() {
+        finalScore+=2*timeLeft;
+        finalScore+=1000;
+    }
+
+    function checkWin(){
+        if (popped===true&&landingZones.length<=0){
+            gameOver=true;
+            gameWon=true;
+            handleWin();
+        }
+        if (frog.center.y<canvas.height/MAPSIZE){
+            let found=false;
+            for (let i=0;i<landingZones.length;i++){
+                if (Math.abs(frog.center.x-landingZones[i])<canvas.width/MAPSIZE/1.9){
+                    finalScore+=50;
+                    found=true;
+                    popped=true;
+                    renderZones.push(xZones[i]);
+                    landingZones.splice(i,1);
+                    xZones.splice(i,1);
+                    console.log(renderZones);
+                    frog.verticalMovementToGo=0;
+                    timeLeft=60;
+                    frog.center={ x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)}
+
+                }
+            }
+            if (!found){
+                handleCollisions();
+            }
+        }
     }
 
     function update(elapsedTime) {
+        if (performance.now()%1000<18){
+            timeLeft--;
+        }
+        if (timeLeft<=0){
+            handleCollisions();
+        }
         frogRender.update(elapsedTime);
         if (frog.verticalMovementToGo<-5){
             let verticalMovement=frog.moveRate*elapsedTime*-1;
@@ -615,6 +722,9 @@
         else{
             frog.center.y=frog.center.y+frog.verticalMovementToGo;
             frog.verticalMovementToGo=0;
+            if (frog.center.y<furthestPointReached) {
+                furthestPointReached = frog.center.y;
+            }
         }
         if (frog.horizontalMovementToGo<-5){
             let verticalMovement=frog.moveRate*elapsedTime*-1;
@@ -628,9 +738,12 @@
         }
         ////TODO put all this ^^ in its own thing
         checkCarCollisions();
+        checkTurtleCollsions(elapsedTime);
+        checkLogCollisions(elapsedTime);
         updateCar(elapsedTime);
         updateLogs(elapsedTime);
         updateTurtles(elapsedTime);
+        checkWin();
 
     }
 
@@ -641,19 +754,24 @@
     //
     //------------------------------------------------------------------
     function render() {
-        // context.clearRect(0, 0, canvas.width, canvas.height);
         graphics.clear();
-        // renderFrog(frog);
         renderMaze();
-        // littleBirdRender.render(littleBird);
+        renderCompletions();
         renderCar();
         renderTurtles();
         renderLogs();
         renderInfoBar();
+        renderBox(timeBar);
         frogRender.render(frog);
-        // turtleRender.render(turtle);
 
 
+    }
+    function renderCompletions(){
+        for (let i=0;i<renderZones.length;i++){
+            context.drawImage(singleFrog,
+                renderZones[i]/ MAPSIZE, 0,
+                35, 35);
+        }
     }
     function renderInfoBar() {
         let spacing =450;
@@ -661,7 +779,15 @@
             context.drawImage(singleFrog,
                 i * spacing / MAPSIZE, canvas.height-(canvas.height/MAPSIZE*1.5),
                 35, 35);
+        }if (timeLeft>0) {
+            timeBar.width = 200 * (timeLeft / 60);
         }
+        context.font="25px Arial";
+        context.fillStyle = "white";
+        context.fillText(timeLeft, canvas.width-(canvas.width/MAPSIZE),
+            canvas.height-(canvas.height/MAPSIZE));
+        context.fillText("Score: "+finalScore, canvas.width/3,
+            canvas.height-(canvas.height/MAPSIZE));
 
     }
 
@@ -676,12 +802,15 @@
                     frog.rotation=Math.PI/2;
                     break;
                 case 38: //up
-                    // if (frog.direction!=2) {
-                        frog.verticalMovementToGo -= canvas.height / MAPSIZE;
-                    // }
+                    frog.verticalMovementToGo -= canvas.height / MAPSIZE;
                     frog.direction=1;
                     frogRender.setIndex(1);
                     frog.rotation=Math.PI;
+                    console.log(furthestPointReached);
+                    console.log(frog.center.y-canvas.height/MAPSIZE);
+                    if(frog.center.y-canvas.height/MAPSIZE<furthestPointReached){
+                        finalScore+=10;
+                    }
                     break;
                 case 39: //right
                     frog.direction=4;
@@ -720,6 +849,12 @@
                         canvas.width/MAPSIZE,  canvas.height/MAPSIZE);
                 }else if ((imgGrass.isReady)&&row===0&&imgLily.isReady) {
                     if (col===1||col===4||col===7||col===10||col===13) {
+                        if (!done&&xZones.length<5){
+                            xZones.push(col*canvas.width);
+                            if (xZones.length>=5){
+                                done=true;
+                            }
+                        }
                         context.drawImage(imgLily,
                             col * canvas.width / MAPSIZE, row * canvas.height / MAPSIZE,
                             canvas.width / MAPSIZE, canvas.height / MAPSIZE);
@@ -739,6 +874,12 @@
     }
 
     function initialize() {
+        landingZones.push(60);
+        landingZones.push(180);
+        landingZones.push(300);
+        landingZones.push(420);
+        landingZones.push(540);
+
         let newCar = new car(yellowCar, .05, 45, -45, canvas.height - (canvas.height / MAPSIZE * 4))
         cars.push(newCar);
         newCar = new car(blueCar, .05, 45, canvas.width/2, canvas.height - (canvas.height / MAPSIZE * 4))
@@ -774,8 +915,6 @@
     function gameLoop(time) {
         let elapsedTime = (time - lastTimeStamp);
         lastTimeStamp = time;
-
-        processInput(elapsedTime);
         update(elapsedTime);
         render();
         if (!gameOver) {
@@ -784,7 +923,7 @@
             handleGameOver();
         }
     };
-    
+
 
     initialize();
 })();

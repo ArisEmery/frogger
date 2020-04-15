@@ -28,6 +28,9 @@ let AnimatedModel = function(spec, graphics) {
     function setIndex(x) {
         subImageIndex=x;
     }
+    function getIndex() {
+        return subImageIndex;
+    }
     //------------------------------------------------------------------
     //
     // Update the state of the animation
@@ -81,7 +84,8 @@ let AnimatedModel = function(spec, graphics) {
     let api = {
         update: update,
         render: render,
-        setIndex: setIndex
+        setIndex: setIndex,
+        getIndex: getIndex
     };
 
     return api;
