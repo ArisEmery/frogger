@@ -1,13 +1,27 @@
-MyGame.main=(function() {
+MyGame.main = (function (objects, input) {
+    // 'use strict';
     let canvas = document.getElementById('id-canvas');
     let context = canvas.getContext("2d");
     let previousTime = performance.now();
     let gameOver=false;
     let gameReady=true;
+    let myKeyboard = input.Keyboard();
     // window.addEventListener('keydown', onKeyDownDefault);
 
 
-    let frog = {
+    // let frog = {
+    //     imageSrc: 'assets/frog.png',
+    //     width: canvas.width/14,
+    //     height: canvas.height/14,
+    //     center: { x: canvas.width/2, y:canvas.height-(canvas.height/14) },
+    //     radius: 26,
+    //     rotation: 0,
+    //     verticalMovementToGo: 0,
+    //     horizontalMovementToGo: 0,
+    //     verticalSpeed: -.05,
+    //     horizontalSpeed: 0,
+    // };
+    let frog = objects.Frog({
         imageSrc: 'assets/frog.png',
         width: canvas.width/14,
         height: canvas.height/14,
@@ -17,8 +31,8 @@ MyGame.main=(function() {
         verticalMovementToGo: 0,
         horizontalMovementToGo: 0,
         verticalSpeed: -.05,
-        horizontalSpeed: 0,
-    };
+        horizontalSpeed: 0,  // Radians per second
+    });
     frog.image = new Image();
     frog.ready = false;
     frog.image.onload = function() {
@@ -83,6 +97,7 @@ MyGame.main=(function() {
     //     }
     // }
 
+
     function gameLoop(time) {
         let elapsedTime = time - previousTime;
         previousTime = time;
@@ -91,9 +106,9 @@ MyGame.main=(function() {
         requestAnimationFrame(gameLoop);
     }
 
-    myKeyboard.register('ArrowUp', bigBird.moveForward);
-    myKeyboard.register('ArrowLeft', bigBird.rotateLeft);
-    myKeyboard.register('ArrowRight', bigBird.rotateRight);
+    myKeyboard.register('w', frog.moveForward);
+    myKeyboard.register('a', frog.moveLeft);
+    myKeyboard.register('d', frog.moveRight);
 
     requestAnimationFrame(gameLoop);
-})();
+}(MyGame.objects, MyGame.input));
