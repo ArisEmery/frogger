@@ -11,6 +11,7 @@
     let lastTimeStamp = performance.now();
     let gameOver=false;
     let gameReady=true;
+    let cars = [];
     window.addEventListener('keydown', onKeyDownDefault);
 
     let imgGrass = new Image();
@@ -33,6 +34,7 @@
         this.isReady = true;
     };
     imgWater.src = 'assets/water.png';
+
     let imgLily = new Image();
     imgLily.isReady = false;
     imgLily.onload = function() {
@@ -40,7 +42,115 @@
     };
     imgLily.src = 'assets/lily.png';
 
+    let yellowCar = new Image();
+    yellowCar.isReady = false;
+    yellowCar.onload = function() {
+        this.isReady = true;
+    };
+    yellowCar.src = 'assets/yellow-car.png';
 
+    let stripedCar = new Image();
+    stripedCar.isReady = false;
+    stripedCar.onload = function() {
+        this.isReady = true;
+    };
+    stripedCar.src = 'assets/stripe-car.png';
+
+    let blueCar = new Image();
+    blueCar.isReady = false;
+    blueCar.onload = function() {
+        this.isReady = true;
+    };
+    blueCar.src = 'assets/blue-car.png';
+
+    let truck = new Image();
+    truck.isReady = false;
+    truck.onload = function() {
+        this.isReady = true;
+    };
+    truck.src = 'assets/truck.png';
+
+    let fireTruck = new Image();
+    fireTruck.isReady = false;
+    fireTruck.onload = function() {
+        this.isReady = true;
+    };
+    fireTruck.src = 'assets/firetruck.png';
+
+    let truck2 = new Image();
+    truck2.isReady = false;
+    truck2.onload = function() {
+        this.isReady = true;
+    };
+    truck2.src = 'assets/truck-reverse.png';
+
+    function car(img,speed,length,x,y){
+        this.img = img;
+        this.speed=speed;
+        this.length=length;
+        this.x=x;
+        this.y=y;
+    }
+
+    
+    function updateCar(elapsedTime){
+        let myRand = Random.nextRange(1,4);
+        console.log(myRand);
+        let timer = performance.now()%5000;
+        if (timer>0&&timer<21) {
+            let myImg=yellowCar;
+            if (myRand===2){
+                myImg=stripedCar;
+            }
+            if (myRand===3){
+                myImg=blueCar;
+            }
+            let newCar = new car(myImg, .05, 45, -45, canvas.height - (canvas.height / MAPSIZE * 4))
+            cars.push(newCar);
+        }
+        timer = performance.now()%5500;
+        if (timer>0&&timer<21) {
+            let newCar = new car(truck, -.05, 120, canvas.width+45, canvas.height - (canvas.height / MAPSIZE * 5))
+            cars.push(newCar);
+        }
+        timer = performance.now()%1500;
+        if (timer>0&&timer<21) {
+            let myImg=yellowCar;
+            if (myRand===2){
+                myImg=stripedCar;
+            }
+            if (myRand===3){
+                myImg=blueCar;
+            }
+            let newCar = new car(myImg, .2, 45, -45, canvas.height - (canvas.height / MAPSIZE * 6))
+            cars.push(newCar);
+        }
+        timer = performance.now()%5000;
+        if (timer>0&&timer<21) {
+            let newCar = new car(fireTruck, .07, 90, -200, canvas.height - (canvas.height / MAPSIZE * 7))
+            cars.push(newCar);
+        }
+        timer = performance.now()%5000;
+        if (timer>0&&timer<21) {
+            let newCar = new car(truck2, .07, 120, -45, canvas.height - (canvas.height / MAPSIZE * 8))
+            cars.push(newCar);
+        }
+
+        for (let i=0;i<cars.length;i++){
+            cars[i].x+= elapsedTime*cars[i].speed;
+        }
+        // newCar.x += elapsedTime*newCar.speed;
+    }
+    function renderCar(){
+        for (let i=0;i<cars.length;i++){
+            context.drawImage(cars[i].img,
+                cars[i].x, cars[i].y,
+                cars[i].length, canvas.height/MAPSIZE);
+        }
+        // context.drawImage(newCar.img,
+        //     newCar.x, newCar.y,
+        //     newCar.length, canvas.height/MAPSIZE);
+    }
 
 
     let frog = {
@@ -71,7 +181,6 @@
     //
     //------------------------------------------------------------------
     function update(elapsedTime) {
-        console.log(frog.center.y);
         frogRender.update(elapsedTime);
         if (frog.verticalMovementToGo<-5){
             let verticalMovement=frog.moveRate*elapsedTime*-1;
@@ -97,6 +206,9 @@
             frog.center.x+=verticalMovement;
             frog.horizontalMovementToGo-=verticalMovement;
         }
+        ////TODO put all this ^^ in its own thing
+        updateCar(elapsedTime);
+
 
 
     }
@@ -130,6 +242,7 @@
         renderFrog(frog)
         // littleBirdRender.render(littleBird);
         frogRender.render(frog);
+        renderCar();
 
     }
     function onKeyDownDefault(e) {
@@ -149,12 +262,6 @@
                     frog.direction=1;
                     frogRender.setIndex(1);
                     frog.rotation=Math.PI;
-                    let vectorX = Math.cos(Math.PI);
-                    let vectorY = Math.sin(Math.PI);
-                    //
-                    // With the normalized direction vector, move the center of the sprite
-                    frog.center.x += (vectorX * spec.moveRate * elapsedTime);
-                    frog.center.y += (vectorY * spec.moveRate * elapsedTime);
                     break;
                 case 39: //right
                     frog.direction=4;
@@ -207,28 +314,20 @@
     }
 
     function initialize() {
-        // let tileX = 0;
-        // let tileY = 0;
-        // for (let i =0;i<MAPSIZE;i++){
-        //     for (let j=0;j<MAPSIZE;j++){
-        //         console.log(j);
-        //         let img = new Image();
-        //         img.isReady = false;
-        //         img.onload = function() {
-        //             this.isReady = true;
-        //         };
-        //         img.src = 'assets/grass.png';
-        //         // drawCell(image)
-        //         context.drawImage()
-        //         context.drawImage(
-        //             img,
-        //             tileX,
-        //             tileY,
-        //             canvas.width/MAPSIZE,canvas.height/MAPSIZE);
-        //         tileX+=canvas.width/MAPSIZE;
-        //     }
-        //     tileY+=canvas.width/MAPSIZE;
-        // }
+        let newCar = new car(yellowCar, .05, 45, -45, canvas.height - (canvas.height / MAPSIZE * 4))
+        cars.push(newCar);
+        newCar = new car(blueCar, .05, 45, canvas.width/2, canvas.height - (canvas.height / MAPSIZE * 4))
+        cars.push(newCar);
+        newCar = new car(truck, -.05, 120, canvas.width/3*2, canvas.height - (canvas.height / MAPSIZE * 5))
+        cars.push(newCar);
+        newCar = new car(truck, -.05, 120, canvas.width+120, canvas.height - (canvas.height / MAPSIZE * 5))
+        cars.push(newCar);
+        newCar = new car(stripedCar, .2, 45, canvas.width/2, canvas.height - (canvas.height / MAPSIZE * 6))
+        cars.push(newCar);
+        newCar = new car(fireTruck, .07, 90, (canvas.width/2)-100, canvas.height - (canvas.height / MAPSIZE * 7))
+        cars.push(newCar);
+        newCar = new car(fireTruck, .07, 90, -45, canvas.height - (canvas.height / MAPSIZE * 7))
+        cars.push(newCar);
         requestAnimationFrame(gameLoop);
 
     }
