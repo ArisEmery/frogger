@@ -24,7 +24,6 @@ let graphics = (function() {
     // --------------------------------------------------------------
     function drawTexture(image, center, rotation, size) {
         context.save();
-
         context.translate(center.x, center.y);
         context.rotate(rotation);
         context.translate(-center.x, -center.y);
@@ -62,8 +61,10 @@ let graphics = (function() {
             image,
             subTextureWidth * index, 0,      // Which sub-texture to pick out
             subTextureWidth, image.height,   // The size of the sub-texture
-            center.x - size.x / 2,           // Where to draw the sub-texture
-            center.y - size.y / 2,
+            // center.x,           // Where to draw the sub-texture
+            // center.y,
+            center.x - size.x /2,           // Where to draw the sub-texture
+            center.y - size.y /2,
             size.x, size.y);
 
         context.restore();
