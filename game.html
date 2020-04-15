@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang = "en-US">
+<head>
+    <meta charset = "UTF-8">
+    <title>Lunar Lander</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+<body>
+
+<!--<form id = "back" class = "gameButton" action="index.html">-->
+<!--    <input type="submit" value="Back" />-->
+<!--</form>-->
+<!--<a href="index.html" class="options">Back</a>-->
+<!--<a href="game.html" class="options">Restart</a>-->
+
+<form id = "newGame" class = "gameButton" action="game.html">
+    <input type="submit" value="Restart" />
+</form>
+
+<canvas id = "id-canvas"
+        width = "1000" height = "1000"
+        style = "width: 50%; height: 50%; border-style: solid; border-width: 1px">
+    <script>
+        let MyGame = {
+            objects: {},
+            input: {},
+            render: {}
+        };
+    </script>
+    <script src = "scripts/game.js"></script>
+<!--    <script src = "scripts/random.js"></script>-->
+<!--    <script src = "scripts/graphics.js"></script>-->
+<!--    <script src = "scripts/particles.js"></script>-->
+
+</canvas>
+
+</body>
