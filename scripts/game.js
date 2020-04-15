@@ -15,47 +15,21 @@
 
 
 
-    // let frog = {
-    //     imageSrc: 'assets/frog.png',
-    //     width: canvas.width/14,
-    //     height: canvas.height/14,
-    //     center: { x: canvas.width/2, y:canvas.height-(canvas.height/14) },
-    //     radius: 26,
-    //     rotation: 0,
-    //     verticalMovementToGo: 0,
-    //     horizontalMovementToGo: 0,
-    //     verticalSpeed: -.05,
-    //     horizontalSpeed: 0,  // Radians per second
-    // };
-    // frog.image = new Image();
-    // frog.ready = false;
-    // frog.image.onload = function() {
-    //     let ar = frog.image.width / frog.image.height;
-    //     frog.ready = true;
-    // };
-    // frog.image.src = frog.imageSrc;
-
     let frog = {
         size: { x: 100, y: 100 },     //size of cropped image
         center: { x: canvas.width/2, y:canvas.height-(canvas.height/14) },
         rotation: Math.PI,
         verticalMovementToGo: 0,
         horizontalMovementToGo: 0,
-        moveRate: 100 / 1000,         // how fast bird moves on control
+        moveRate: .5,         // how fast bird moves on control
         rotateRate: Math.PI / 1000
     }
-    frog.image = new Image();
-    frog.ready = false;
-    frog.image.onload = function() {
-        let ar = frog.image.width / frog.image.height;
-        frog.ready = true;
-    };
-    frog.image.src = frog.imageSrc;
+
 
     let frogRender = AnimatedModel({
         spriteSheet: 'assets/frogSprites.png',
         spriteCount: 7,
-        spriteTime: [50,50,50,50,50,50,50],   // ms per frame
+        spriteTime: [35,35,35,35,35,35,35],   // ms per frame
     }, graphics);
 
 
@@ -69,6 +43,28 @@
     //------------------------------------------------------------------
     function update(elapsedTime) {
         frogRender.update(elapsedTime);
+        console.log(frog.verticalMovementToGo);
+        if (frog.verticalMovementToGo<-5){
+            let verticalMovement=frog.moveRate*elapsedTime*-1;
+            frog.center.y+=verticalMovement;
+            frog.verticalMovementToGo-=verticalMovement;
+        }
+        if (frog.verticalMovementToGo>5){
+            let verticalMovement=frog.moveRate*elapsedTime;
+            frog.center.y+=verticalMovement;
+            frog.verticalMovementToGo-=verticalMovement;
+        }
+        if (frog.horizontalMovementToGo<-5){
+            let verticalMovement=frog.moveRate*elapsedTime*-1;
+            frog.center.x+=verticalMovement;
+            frog.horizontalMovementToGo-=verticalMovement;
+        }
+        if (frog.horizontalMovementToGo>5){
+            let verticalMovement=frog.moveRate*elapsedTime;
+            frog.center.x+=verticalMovement;
+            frog.horizontalMovementToGo-=verticalMovement;
+        }
+
 
     }
 
@@ -107,21 +103,21 @@
             switch (e.keyCode) {
                 case 37: //left
                     frogRender.setIndex(1);
-                    frog.center.x-=canvas.height/14
+                    frog.horizontalMovementToGo-=canvas.height/14
                     frog.rotation=Math.PI/2;
                     break;
                 case 38: //up
                     frogRender.setIndex(1);
-                    frog.center.y-=canvas.height/14
+                    frog.verticalMovementToGo-=canvas.height/14;
                     frog.rotation=Math.PI;
                     break;
                 case 39: //right
                     frogRender.setIndex(1);
-                    frog.center.x+=canvas.height/14
+                    frog.horizontalMovementToGo+=canvas.height/14;
                     frog.rotation=-Math.PI/2;
                     break;
                 case 40: //down
-                    frog.center.y+=canvas.height/14
+                    frog.verticalMovementToGo+=canvas.height/14;
                     frog.rotation=0;
                     frogRender.setIndex(1);
                     break;

@@ -7,7 +7,7 @@ let AnimatedModel = function(spec, graphics) {
     // 'use strict';
 
     let animationTime = 0;
-    let subImageIndex = 0;
+    let subImageIndex = 6;
     let subTextureWidth = 0;
     let animate=true;
     let image = new Image();
@@ -44,8 +44,6 @@ let AnimatedModel = function(spec, graphics) {
             }
             else {
                 subImageIndex += 1;
-                console.log(subImageIndex);
-
                 //
                 // Wrap around from the last back to the first sprite as needed
                 subImageIndex = subImageIndex % spec.spriteCount; //todo imporant
