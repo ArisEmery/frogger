@@ -22,7 +22,7 @@ let Frog = function(spec) {
     }
 
     function rotateLeft(elapsedTime) {
-        spec.rotation -= spec.rotateRate * (elapsedTime);
+        spec.rotation =  0;
     }
 
     function rotateRight(elapsedTime) {

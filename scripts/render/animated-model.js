@@ -4,11 +4,12 @@
 //
 // --------------------------------------------------------------
 let AnimatedModel = function(spec, graphics) {
-    'use strict';
+    // 'use strict';
 
     let animationTime = 0;
     let subImageIndex = 0;
     let subTextureWidth = 0;
+    let animate=true;
     let image = new Image();
     let isReady = false;  // Can't render until the texture is loaded
 
@@ -20,6 +21,9 @@ let AnimatedModel = function(spec, graphics) {
     }
     image.src = spec.spriteSheet;
 
+    function setIndex(x) {
+        subImageIndex=x;
+    }
     //------------------------------------------------------------------
     //
     // Update the state of the animation
@@ -32,12 +36,20 @@ let AnimatedModel = function(spec, graphics) {
         if (animationTime >= spec.spriteTime[subImageIndex]) {
             //
             // When switching sprites, keep the leftover time because
-            // it needs to be accounted for the next sprite animation frame.
+            // it needs to be accounted for the next sprite animation frame;
+            let keepgoing =true;
             animationTime -= spec.spriteTime[subImageIndex];
-            subImageIndex += 1;
-            //
-            // Wrap around from the last back to the first sprite as needed
-            subImageIndex = subImageIndex % spec.spriteCount;
+            if (subImageIndex>=spec.spriteCount-1) {
+                animate=false;
+            }
+            else {
+                subImageIndex += 1;
+                console.log(subImageIndex);
+
+                //
+                // Wrap around from the last back to the first sprite as needed
+                subImageIndex = subImageIndex % spec.spriteCount; //todo imporant
+            }
         }
     }
 
@@ -54,7 +66,8 @@ let AnimatedModel = function(spec, graphics) {
 
     let api = {
         update: update,
-        render: render
+        render: render,
+        setIndex: setIndex
     };
 
     return api;

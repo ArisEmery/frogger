@@ -15,18 +15,35 @@
 
 
 
+    // let frog = {
+    //     imageSrc: 'assets/frog.png',
+    //     width: canvas.width/14,
+    //     height: canvas.height/14,
+    //     center: { x: canvas.width/2, y:canvas.height-(canvas.height/14) },
+    //     radius: 26,
+    //     rotation: 0,
+    //     verticalMovementToGo: 0,
+    //     horizontalMovementToGo: 0,
+    //     verticalSpeed: -.05,
+    //     horizontalSpeed: 0,  // Radians per second
+    // };
+    // frog.image = new Image();
+    // frog.ready = false;
+    // frog.image.onload = function() {
+    //     let ar = frog.image.width / frog.image.height;
+    //     frog.ready = true;
+    // };
+    // frog.image.src = frog.imageSrc;
+
     let frog = {
-        imageSrc: 'assets/frog.png',
-        width: canvas.width/14,
-        height: canvas.height/14,
+        size: { x: 100, y: 100 },     //size of cropped image
         center: { x: canvas.width/2, y:canvas.height-(canvas.height/14) },
-        radius: 26,
-        rotation: 0,
+        rotation: Math.PI,
         verticalMovementToGo: 0,
         horizontalMovementToGo: 0,
-        verticalSpeed: -.05,
-        horizontalSpeed: 0,  // Radians per second
-    };
+        moveRate: 100 / 1000,         // how fast bird moves on control
+        rotateRate: Math.PI / 1000
+    }
     frog.image = new Image();
     frog.ready = false;
     frog.image.onload = function() {
@@ -35,18 +52,10 @@
     };
     frog.image.src = frog.imageSrc;
 
-    let littleBird = Frog({
-        size: { x: 50, y: 50 },       // Size in pixels
-        center: { x: 50, y: 150 },
-        rotation: 0,
-        moveRate: 125 / 1000,         // Pixels per second
-        rotateRate: Math.PI / 1000    // Radians per second
-    });
-
-    let littleBirdRender = AnimatedModel({
-        spriteSheet: 'assets/spritesheet-bird.png',
-        spriteCount: 14,
-        spriteTime: [40, 40, 40, 40, 40, 40, 40,40, 40, 40, 40, 40, 40, 40],   // ms per frame
+    let frogRender = AnimatedModel({
+        spriteSheet: 'assets/frogSprites.png',
+        spriteCount: 7,
+        spriteTime: [50,50,50,50,50,50,50],   // ms per frame
     }, graphics);
 
 
@@ -59,11 +68,7 @@
     //
     //------------------------------------------------------------------
     function update(elapsedTime) {
-        frog.center.y+= frog.verticalMovementToGo;
-        frog.verticalMovementToGo=0;
-        frog.center.x+=frog.horizontalMovementToGo;
-        frog.horizontalMovementToGo=0;
-        littleBirdRender.update(elapsedTime);
+        frogRender.update(elapsedTime);
 
     }
 
@@ -91,29 +96,34 @@
     function render() {
         // context.clearRect(0, 0, canvas.width, canvas.height);
         graphics.clear();
-        renderFrog(frog);
-
-        littleBirdRender.render(littleBird);
+        // renderFrog(frog);
+        renderFrog(frog)
+        // littleBirdRender.render(littleBird);
+        frogRender.render(frog);
     }
     function onKeyDownDefault(e) {
         // var code = e;
         if(!gameOver&&gameReady) {
             switch (e.keyCode) {
                 case 37: //left
-                    frog.horizontalMovementToGo-=frog.width;
-                    frog.rotation=-Math.PI/2;
-                    break;
-                case 38: //up
-                    frog.verticalMovementToGo-=frog.height;
-                    frog.rotation=0;
-                    break;
-                case 39: //down
-                    frog.horizontalMovementToGo+=frog.width;
+                    frogRender.setIndex(1);
+                    frog.center.x-=canvas.height/14
                     frog.rotation=Math.PI/2;
                     break;
-                case 40: //down
-                    frog.verticalMovementToGo+=frog.height;
+                case 38: //up
+                    frogRender.setIndex(1);
+                    frog.center.y-=canvas.height/14
                     frog.rotation=Math.PI;
+                    break;
+                case 39: //right
+                    frogRender.setIndex(1);
+                    frog.center.x+=canvas.height/14
+                    frog.rotation=-Math.PI/2;
+                    break;
+                case 40: //down
+                    frog.center.y+=canvas.height/14
+                    frog.rotation=0;
+                    frogRender.setIndex(1);
                     break;
                 default:
                     console.log(code);
