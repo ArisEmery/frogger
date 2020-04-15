@@ -11,6 +11,7 @@
     let lastTimeStamp = performance.now();
     let gameOver=false;
     let gameReady=true;
+    let numLives=3;
     let cars = [];
     window.addEventListener('keydown', onKeyDownDefault);
 
@@ -84,6 +85,32 @@
     };
     truck2.src = 'assets/truck-reverse.png';
 
+    let singleFrog = new Image();
+    singleFrog.isReady = false;
+    singleFrog.onload = function() {
+        this.isReady = true;
+    };
+    singleFrog.src = 'assets/single-frog.png';
+
+    let frog = {
+        size: { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE },     //size of cropped image
+        center: { x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)},
+        rotation: Math.PI,
+        verticalMovementToGo: 0,
+        horizontalMovementToGo: 0,
+        radius: canvas.width/MAPSIZE/2,
+        direction: 1,  //1 is up, 2 is down, 3 is left, for is right
+        moveRate: .5,         // how fast bird moves on control
+        rotateRate: Math.PI / 1000
+    }
+
+
+    let frogRender = AnimatedModel({
+        spriteSheet: 'assets/frogSprites.png',
+        spriteCount: 7,
+        spriteTime: [40,40,40,55,55,40,40],   // ms per frame
+    }, graphics);
+
     function car(img,speed,length,x,y){
         this.img = img;
         this.speed=speed;
@@ -91,11 +118,35 @@
         this.x=x;
         this.y=y;
     }
+   //todo every few second pop the last few car off the list (as many as spawn in those seconds)
+    function checkCollisions(){
+        for (let i=0;i<cars.length;i++){
+            //TODO make this only work on the road to optimize
+            if (cars[i].y+20===frog.center.y){
+                let theirRadius=cars[i].length/2;
+                let minimumDistance=frog.radius+theirRadius-10;
+                let carCollionX=5+cars[i].x+(cars[i].length/2);
+                if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
+                    console.log("collision detected");
+                    handleCollions();
+                }
 
-    
+            }
+        }
+    }
+    function handleCollions() {
+        frog.center.x=(canvas.width/2);
+        frog.center.y=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)
+        if(numLives>0){
+            numLives--;
+        }else{
+            alert("you lost!");
+        }
+    }
+
+
     function updateCar(elapsedTime){
         let myRand = Random.nextRange(1,4);
-        console.log(myRand);
         let timer = performance.now()%5000;
         if (timer>0&&timer<21) {
             let myImg=yellowCar;
@@ -139,7 +190,9 @@
         for (let i=0;i<cars.length;i++){
             cars[i].x+= elapsedTime*cars[i].speed;
         }
-        // newCar.x += elapsedTime*newCar.speed;
+        if (cars.length>=30){
+            cars.splice(0, 5);
+        }
     }
     function renderCar(){
         for (let i=0;i<cars.length;i++){
@@ -147,29 +200,8 @@
                 cars[i].x, cars[i].y,
                 cars[i].length, canvas.height/MAPSIZE);
         }
-        // context.drawImage(newCar.img,
-        //     newCar.x, newCar.y,
-        //     newCar.length, canvas.height/MAPSIZE);
     }
 
-
-    let frog = {
-        size: { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE },     //size of cropped image
-        center: { x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)},
-        rotation: Math.PI,
-        verticalMovementToGo: 0,
-        horizontalMovementToGo: 0,
-        direction: 1,  //1 is up, 2 is down, 3 is left, for is right
-        moveRate: .5,         // how fast bird moves on control
-        rotateRate: Math.PI / 1000
-    }
-
-
-    let frogRender = AnimatedModel({
-        spriteSheet: 'assets/frogSprites.png',
-        spriteCount: 7,
-        spriteTime: [40,40,40,55,55,40,40],   // ms per frame
-    }, graphics);
 
 
     function processInput(elapsedTime) {
@@ -207,6 +239,7 @@
             frog.horizontalMovementToGo-=verticalMovement;
         }
         ////TODO put all this ^^ in its own thing
+        checkCollisions();
         updateCar(elapsedTime);
 
 
@@ -243,8 +276,19 @@
         // littleBirdRender.render(littleBird);
         frogRender.render(frog);
         renderCar();
+        renderInfoBar();
 
     }
+    function renderInfoBar() {
+        let spacing =450;
+        for (let i=0; i<numLives; i++){
+            context.drawImage(singleFrog,
+                i * spacing / MAPSIZE, canvas.height-(canvas.height/MAPSIZE*1.5),
+                35, 35);
+        }
+
+    }
+
     function onKeyDownDefault(e) {
         // var code = e;
         if(!gameOver&&gameReady) {
