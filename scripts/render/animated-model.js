@@ -8,9 +8,13 @@ let AnimatedModel = function(spec, graphics) {
 
     let animationTime = 0;
     let subImageIndex = 6;
+    if (spec.type!=0){
+        subImageIndex=0;
+    }
     let subTextureWidth = 0;
     let animate=true;
     let image = new Image();
+    let increment=1;
     let isReady = false;  // Can't render until the texture is loaded
 
     //
@@ -37,16 +41,28 @@ let AnimatedModel = function(spec, graphics) {
             //
             // When switching sprites, keep the leftover time because
             // it needs to be accounted for the next sprite animation frame;
-            let keepgoing =true;
             animationTime -= spec.spriteTime[subImageIndex];
-            if (subImageIndex>=spec.spriteCount-1) {
+
+            if (subImageIndex>=spec.spriteCount-1&&spec.type===0) {
                 animate=false;
             }
             else {
-                subImageIndex += 1;
+                subImageIndex += increment;
                 //
                 // Wrap around from the last back to the first sprite as needed
-                subImageIndex = subImageIndex % spec.spriteCount; //todo imporant
+                // if (subImageIndex>=spec.spriteCount-1){
+                //     subImageIndex=0;
+                // }
+                if (spec.type===3){
+                    if (subImageIndex>=spec.spriteCount-1){
+                        increment=-1;
+                    }
+                    if (subImageIndex===0){
+                        increment=1;
+                    }
+                }else {
+                    subImageIndex = subImageIndex % spec.spriteCount;
+                }
             }
         }
     }

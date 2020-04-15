@@ -13,6 +13,9 @@
     let gameReady=true;
     let numLives=3;
     let cars = [];
+    let logs = [];
+    let turtles = [];
+    let turtleRenders=[];
     window.addEventListener('keydown', onKeyDownDefault);
 
     let imgGrass = new Image();
@@ -92,6 +95,27 @@
     };
     singleFrog.src = 'assets/single-frog.png';
 
+    let smallLog = new Image();
+    smallLog.isReady = false;
+    smallLog.onload = function() {
+        this.isReady = true;
+    };
+    smallLog.src = 'assets/small-log.png';
+
+    let mediumLog = new Image();
+    mediumLog.isReady = false;
+    mediumLog.onload = function() {
+        this.isReady = true;
+    };
+    mediumLog.src = 'assets/medium-log.png';
+
+    let largeLog = new Image();
+    largeLog.isReady = false;
+    largeLog.onload = function() {
+        this.isReady = true;
+    };
+    largeLog.src = 'assets/large-log.png';
+
     let frog = {
         size: { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE },     //size of cropped image
         center: { x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)},
@@ -100,16 +124,45 @@
         horizontalMovementToGo: 0,
         radius: canvas.width/MAPSIZE/2,
         direction: 1,  //1 is up, 2 is down, 3 is left, for is right
-        moveRate: .5,         // how fast bird moves on control
-        rotateRate: Math.PI / 1000
-    }
+        moveRate: .5,
+        rotateRate: Math.PI / 1000,
+        // type: 1
+    };
 
 
     let frogRender = AnimatedModel({
         spriteSheet: 'assets/frogSprites.png',
         spriteCount: 7,
-        spriteTime: [40,40,40,55,55,40,40],   // ms per frame
+        spriteTime: [40,40,40,55,55,40,40],
+        type: 0,
     }, graphics);
+
+    let turtleRender = new AnimatedModel({
+        spriteSheet: 'assets/turtle-sprite.png',
+        spriteCount: 2,
+        spriteTime: [200,200],
+        type: 1,
+    }, graphics);
+
+    let turtle={
+        size: { x: canvas.width/MAPSIZE*.75, y: canvas.height/MAPSIZE*.75 },     //size of cropped image
+        speed: .1,
+        center: { x: canvas.width/2, y:canvas.height - (canvas.height / MAPSIZE * 13)},
+        rotation: Math.PI,
+        rotateRate: Math.PI / 1000,
+
+    };
+
+    function turtleshell(speed,center,type) {
+        this.speed=speed;
+        this.center=center;
+        this.type=type;
+        this.size = { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE };   //size of cropped image
+        this.rotation= -Math.PI;
+        this.rotateRate= Math.PI / 1000;
+
+    }
+
 
     function car(img,speed,length,x,y){
         this.img = img;
@@ -118,8 +171,17 @@
         this.x=x;
         this.y=y;
     }
+
+    function log(img,speed,length,x,y){
+        this.img = img;
+        this.speed=speed;
+        this.length=length;
+        this.x=x;
+        this.y=y;
+    }
+
    //todo every few second pop the last few car off the list (as many as spawn in those seconds)
-    function checkCollisions(){
+    function checkCarCollisions(){
         for (let i=0;i<cars.length;i++){
             //TODO make this only work on the road to optimize
             if (cars[i].y+20===frog.center.y){
@@ -128,19 +190,338 @@
                 let carCollionX=5+cars[i].x+(cars[i].length/2);
                 if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
                     console.log("collision detected");
-                    handleCollions();
+                    handleCollisions();
                 }
 
             }
         }
     }
-    function handleCollions() {
+    function handleCollisions() {
         frog.center.x=(canvas.width/2);
         frog.center.y=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)
         if(numLives>0){
             numLives--;
         }else{
-            alert("you lost!");
+            gameOver=true;
+        }
+    }
+    function updateTurtles(elapsedTime) {
+        let timer = performance.now()%5000;
+        if (timer>0&&timer<21) {
+            let myRand = Random.nextRange(1,5);
+            if (myRand===1) {
+                let center = {
+                    x: 200+canvas.width,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.05, center,1);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - (canvas.width / MAPSIZE * 2),
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+            if (myRand===2) {
+                let center = {
+                    x: 200+canvas.width,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.05, center,1);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+
+            }
+            if (myRand===3) {
+                let center = {
+                    x: canvas.width+200,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.05, center,2);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - (canvas.width / MAPSIZE * 2),
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+            if (myRand===4) {
+                let center = {
+                    x: canvas.width+200,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.05, center,2);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 13) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.05, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+        }
+        timer = performance.now()%4000;
+        if (timer>0&&timer<21) {
+            let myRand = Random.nextRange(1,5);
+            if (myRand===1) {
+                let center = {
+                    x: 200+canvas.width,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.07, center,1);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - (canvas.width / MAPSIZE * 2),
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+            if (myRand===2) {
+                let center = {
+                    x: 200+canvas.width,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.07, center,1);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: 200+canvas.width - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,1);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sink-sprite.png',
+                    spriteCount: 11,
+                    spriteTime: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+                    type: 3,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+
+            }
+            if (myRand===3) {
+                let center = {
+                    x: canvas.width+200,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.07, center,2);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - (canvas.width / MAPSIZE * 2),
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+            if (myRand===4) {
+                let center = {
+                    x: canvas.width+200,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                let newTurtle = new turtleshell(-.07, center,2);
+                let turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+                center = {
+                    x: canvas.width+200 - canvas.width / MAPSIZE,
+                    y: canvas.height - (canvas.height / MAPSIZE * 10) + (canvas.height / MAPSIZE / 2)
+                };
+                newTurtle = new turtleshell(-.07, center,2);
+                turtleRender = new AnimatedModel({
+                    spriteSheet: 'assets/turtle-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [200,200],
+                    type: 1,
+                }, graphics);
+                turtleRenders.push(turtleRender);
+                turtles.push(newTurtle);
+            }
+        }
+        for (let i=0;i<turtles.length;i++){
+            turtleRenders[i].update(elapsedTime);
+            turtles[i].center.x+= elapsedTime*turtles[i].speed;
+        }
+        if (turtles.length>=20){
+            turtles.splice(0, 5);
+        }
+    }
+
+    function updateLogs(elapsedTime){
+        let timer = performance.now()%3000;
+        if (timer>0&&timer<21) {
+            let newLog = new log(smallLog, .05, 60, -65, canvas.height - (canvas.height / MAPSIZE * 11))
+            logs.push(newLog);
+        }
+        timer = performance.now()%5000;
+        if (timer>0&&timer<21) {
+            let newLog = new log(largeLog, .08, 120, -125, canvas.height - (canvas.height / MAPSIZE * 12))
+            logs.push(newLog);
+        }
+        timer = performance.now()%4000;
+        if (timer>0&&timer<21) {
+            let newLog = new log(mediumLog, .05, 90, -95, canvas.height - (canvas.height / MAPSIZE * 14))
+            logs.push(newLog);
+        }
+        for (let i=0;i<logs.length;i++){
+            logs[i].x+= elapsedTime*logs[i].speed;
+        }
+        if (logs.length>=30){
+            logs.splice(0, 5);
         }
     }
 
@@ -202,16 +583,23 @@
         }
     }
 
-
+    function renderLogs(){
+        for (let i=0;i<logs.length;i++){
+            context.drawImage(logs[i].img,
+                logs[i].x, logs[i].y,
+                logs[i].length, canvas.height/MAPSIZE*.75);
+        }
+    }
+    function renderTurtles() {
+        for (let i=0;i<turtles.length;i++){
+            console.log(turtles[i]);
+            turtleRenders[i].render(turtles[i])
+        }
+    }
 
     function processInput(elapsedTime) {
     }
 
-    //------------------------------------------------------------------
-    //
-    // Update the particles
-    //
-    //------------------------------------------------------------------
     function update(elapsedTime) {
         frogRender.update(elapsedTime);
         if (frog.verticalMovementToGo<-5){
@@ -239,28 +627,13 @@
             frog.horizontalMovementToGo-=verticalMovement;
         }
         ////TODO put all this ^^ in its own thing
-        checkCollisions();
+        checkCarCollisions();
         updateCar(elapsedTime);
-
-
+        updateLogs(elapsedTime);
+        updateTurtles(elapsedTime);
 
     }
 
-
-    function renderFrog(frog) {
-        if (frog.ready) {
-            context.save();
-            context.translate(frog.center.x, frog.center.y);
-            context.rotate(frog.rotation);
-            context.translate(-frog.center.x, -frog.center.y);
-            context.drawImage(
-                frog.image,
-                frog.center.x - frog.width/2,
-                frog.center.y - frog.height/2,
-                frog.width, frog.height);
-            context.restore();
-        }
-    }
 
     //------------------------------------------------------------------
     //
@@ -272,11 +645,14 @@
         graphics.clear();
         // renderFrog(frog);
         renderMaze();
-        renderFrog(frog)
         // littleBirdRender.render(littleBird);
-        frogRender.render(frog);
         renderCar();
+        renderTurtles();
+        renderLogs();
         renderInfoBar();
+        frogRender.render(frog);
+        // turtleRender.render(turtle);
+
 
     }
     function renderInfoBar() {
@@ -356,6 +732,11 @@
             }
         }
     }
+    function handleGameOver() {
+        context.font="50px Arial";
+        context.fillStyle = "white";
+        context.fillText("Game Over...", 150, (canvas.height/2)-25);
+    }
 
     function initialize() {
         let newCar = new car(yellowCar, .05, 45, -45, canvas.height - (canvas.height / MAPSIZE * 4))
@@ -372,6 +753,20 @@
         cars.push(newCar);
         newCar = new car(fireTruck, .07, 90, -45, canvas.height - (canvas.height / MAPSIZE * 7))
         cars.push(newCar);
+        let newLog = new log(smallLog, .05, 60, canvas.width/3, canvas.height - (canvas.height / MAPSIZE * 11))
+        logs.push(newLog);
+        newLog = new log(smallLog, .05, 60, canvas.width/3*2, canvas.height - (canvas.height / MAPSIZE * 11))
+        logs.push(newLog);
+        newLog = new log(smallLog, .05, 60, -65, canvas.height - (canvas.height / MAPSIZE * 11))
+        logs.push(newLog);
+        newLog = new log(largeLog, .08, 120, -25, canvas.height - (canvas.height / MAPSIZE * 12))
+        logs.push(newLog);
+        newLog = new log(largeLog, .08, 120, (canvas.width/2)+120, canvas.height - (canvas.height / MAPSIZE * 12))
+        logs.push(newLog);
+        newLog = new log(mediumLog, .05, 90, -5, canvas.height - (canvas.height / MAPSIZE * 14))
+        logs.push(newLog);
+        newLog = new log(mediumLog, .05, 90, canvas.height/2+100, canvas.height - (canvas.height / MAPSIZE * 14))
+        logs.push(newLog);
         requestAnimationFrame(gameLoop);
 
     }
@@ -383,13 +778,13 @@
         processInput(elapsedTime);
         update(elapsedTime);
         render();
-
-        requestAnimationFrame(gameLoop);
+        if (!gameOver) {
+            requestAnimationFrame(gameLoop);
+        }else{
+            handleGameOver();
+        }
     };
-
-
-
-
+    
 
     initialize();
 })();
