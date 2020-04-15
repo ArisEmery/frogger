@@ -2,38 +2,17 @@
 <html lang = "en-US">
 <head>
     <meta charset = "UTF-8">
-    <title>Lunar Lander</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-
+    <title>Spritesheet Animation</title>
+    <link rel = "stylesheet" type = "text/css" href = "styles.css">
 </head>
 <body>
+<canvas id = "id-canvas" width = "600" height = "600"></canvas>
+<script src = "scripts/render/core.js"></script>
+<script src = "scripts/render/animated-model.js"></script>
+<script src = "scripts/objects/bird.js"></script>
 
-<!--<form id = "back" class = "gameButton" action="index.html">-->
-<!--    <input type="submit" value="Back" />-->
-<!--</form>-->
-<!--<a href="index.html" class="options">Back</a>-->
-<!--<a href="game.html" class="options">Restart</a>-->
+<script src = "scripts/game.js"></script>
 
-<form id = "newGame" class = "gameButton" action="game.html">
-    <input type="submit" value="Restart" />
-</form>
-
-<canvas id = "id-canvas"
-        width = "1000" height = "1000"
-        style = "width: 50%; height: 50%; border-style: solid; border-width: 1px">
-    <script>
-        let MyGame = {
-            objects: {},
-            input: {},
-            // render: {}
-        };
-    </script>
-    <script src = "scripts/input/keyboard.js"></script>
-<!--    <script src = "scripts/render/core.js"></script>-->
-<!--    <script src = "scripts/render/animated-model.js"></script>-->
-    <script src = "scripts/objects/frog.js"></script>
-    <script src = "scripts/game.js"></script>
-
-</canvas>
 
 </body>
+</html>

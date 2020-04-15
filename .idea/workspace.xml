@@ -2,10 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="454c5188-4c7a-4f44-86b5-b80768e752de" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/render/animated-model.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/render/core.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/spritesheet-bird.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/game.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/input/keyboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/objects/frog.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/assets" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -34,6 +41,9 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/scripts" />
     </key>
@@ -62,7 +72,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1586911343696</updated>
-      <workItem from="1586911345143" duration="9455000" />
+      <workItem from="1586911345143" duration="15427000" />
     </task>
     <servers />
   </component>
@@ -70,9 +80,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="622" y="214" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1586919400794">
-      <screen x="0" y="23" width="1280" height="713" />
+    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1586927883943">
+      <screen x="0" y="23" width="1280" height="715" />
     </state>
     <state x="622" y="214" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1280.713@0.23.1280.713" timestamp="1586919400794" />
+    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1280.715@0.23.1280.715" timestamp="1586927883943" />
   </component>
 </project>
