@@ -97,7 +97,7 @@ let graphics = (function() {
         clear: clear,
         drawTexture: drawTexture,
         drawSubTexture: drawSubTexture,
-        drawRectangle: drawRectangle
+        drawRectangle: drawRectangle,
     };
 
     return api;

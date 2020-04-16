@@ -85,7 +85,8 @@ let AnimatedModel = function(spec, graphics) {
         update: update,
         render: render,
         setIndex: setIndex,
-        getIndex: getIndex
+        getIndex: getIndex,
+        subImageIndex: subImageIndex
     };
 
     return api;

@@ -17,6 +17,8 @@
     let logs = [];
     let turtles = [];
     let turtleRenders=[];
+    let alligators=[];
+    let alligatorRenders=[];
     let landingZones =[];
     let done =false;
     let popped=false;
@@ -161,6 +163,7 @@
     };
     blue.src = 'assets/blue.jpeg';
 
+
     let carCrash = ParticleSystem(Graphics, {
         image: singleFrog,
         image2: imgRoad,
@@ -197,7 +200,7 @@
         direction: 1,  //1 is up, 2 is down, 3 is left, for is right
         moveRate: .5,
         rotateRate: Math.PI / 1000,
-        swimTime: 1000
+        swimTime: 500
         // type: 1
     };
 
@@ -210,6 +213,15 @@
     }, graphics);
 
     function turtleshell(speed,center,type) {
+        this.speed=speed;
+        this.center=center;
+        this.type=type;
+        this.size = { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE };   //size of cropped image
+        this.rotation= -Math.PI;
+        this.rotateRate= Math.PI / 1000;
+    }
+
+    function gatorShell(speed,center,type) {
         this.speed=speed;
         this.center=center;
         this.type=type;
@@ -267,11 +279,11 @@
                 if (Math.abs(frog.center.x-turtles[i].center.x)<(canvas.width/MAPSIZE)-10){
                     if (turtles[i].type!=1) {
                         frog.center.x += turtles[i].speed * elapsedTime;
-                        frog.swimTime=1000;
+                        frog.swimTime=500;
                     }else{
                         if (turtleRenders[i].getIndex()<8){
                             frog.center.x += turtles[i].speed * elapsedTime;
-                            frog.swimTime=1000;
+                            frog.swimTime=500;
                         }{
                             frog.swimTime-=elapsedTime;
                         }
@@ -287,6 +299,30 @@
             }
         }
     }
+    function checkAlligatorCollsions(elapsedTime) {
+        for (let i = 0; i < alligators.length; i++) {
+            //TODO make this only work on the road to optimize
+            if (Math.abs(alligators[i].center.y - frog.center.y) < (canvas.height / MAPSIZE) - 39) {
+                let theirRadius = canvas.width / MAPSIZE / 2;
+                if (Math.abs(frog.center.x - alligators[i].center.x) < (canvas.width / MAPSIZE) - 10) {
+                    if (alligatorRenders[i].getIndex() === 1) {
+                        frog.center.x += alligators[i].speed * elapsedTime;
+                        frog.swimTime = 500;
+                    } else {
+                        frog.swimTime -= elapsedTime;
+                    }
+
+
+                }else{
+                    frog.swimTime-=elapsedTime;
+                }
+                if (frog.swimTime < 0) {
+                    splash.update3(frog);
+                    handleCollisions();
+                }
+            }
+        }
+    }
     function checkLogCollisions(elapsedTime){
         for (let i=0;i<logs.length;i++){
             //TODO make this only work on the road to optimize
@@ -296,7 +332,7 @@
                 let carCollionX=5+logs[i].x+(logs[i].length/2);
                 if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
                     frog.center.x += logs[i].speed * elapsedTime;
-                    frog.swimTime=1000;
+                    frog.swimTime=500;
                 }else{
                     frog.swimTime-=elapsedTime;
                 }
@@ -310,7 +346,7 @@
     function handleCollisions() {
         frog.center.x=(canvas.width/2);
         frog.center.y=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2);
-        frog.swimTime=1000;
+        frog.swimTime=500;
         timeLeft=60;
         if(numLives>0){
             numLives--;
@@ -617,6 +653,7 @@
     function updateLogs(elapsedTime){
         let timer = performance.now()%3000;
         if (timer>0&&timer<15) {
+
             let newLog = new log(smallLog, .05, 60, -65, canvas.height - (canvas.height / MAPSIZE * 11))
             logs.push(newLog);
         }
@@ -625,13 +662,38 @@
             let newLog = new log(largeLog, .08, 120, -125, canvas.height - (canvas.height / MAPSIZE * 12))
             logs.push(newLog);
         }
-        timer = performance.now()%4000;
+        timer = performance.now()%3000;
         if (timer>0&&timer<15) {
-            let newLog = new log(mediumLog, .05, 90, -95, canvas.height - (canvas.height / MAPSIZE * 14))
-            logs.push(newLog);
+            let rand = Random.nextRange(1,5)
+            if (rand===1){
+                let center = {
+                    x: -95,
+                    y: canvas.height - (canvas.height / MAPSIZE * 14) + (canvas.height / MAPSIZE / 2)
+                };
+                let gator = new gatorShell(.05, center,1);
+                let gatorRender = new AnimatedModel({
+                    spriteSheet: 'assets/aligator-sprite.png',
+                    spriteCount: 2,
+                    spriteTime: [4000, 4000],
+                    type: 4,
+                }, graphics);
+                alligatorRenders.push(gatorRender);
+                alligators.push(gator);
+            }else {
+                let newLog = new log(mediumLog, .05, 90, -95, canvas.height - (canvas.height / MAPSIZE * 14))
+                logs.push(newLog);
+            }
         }
         for (let i=0;i<logs.length;i++){
             logs[i].x+= elapsedTime*logs[i].speed;
+        }
+        for (let i=0;i<alligators.length;i++){
+            alligatorRenders[i].update(elapsedTime);
+            alligators[i].center.x+= elapsedTime*alligators[i].speed;
+        }
+        if (alligators.length>=5){
+            alligators.splice(0, 1);
+            alligatorRenders.splice(0, 1);
         }
         if (logs.length>=30){
             logs.splice(0, 5);
@@ -701,6 +763,9 @@
             context.drawImage(logs[i].img,
                 logs[i].x, logs[i].y,
                 logs[i].length, canvas.height/MAPSIZE*.75);
+        }
+        for (let i=0;i<alligators.length;i++){
+            alligatorRenders[i].render(alligators[i])
         }
     }
     function renderTurtles() {
@@ -819,6 +884,7 @@
         ////TODO put all this ^^ in its own thing
         checkCarCollisions();
         checkTurtleCollsions(elapsedTime);
+        checkAlligatorCollsions(elapsedTime);
         checkLogCollisions(elapsedTime);
         updateCar(elapsedTime);
         updateLogs(elapsedTime);
