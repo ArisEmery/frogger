@@ -15,6 +15,7 @@
     let numLives=3;
     let cars = [];
     let logs = [];
+    let xZonesClone=[];
     let turtles = [];
     let turtleRenders=[];
     let alligators=[];
@@ -24,6 +25,7 @@
     let popped=false;
     let timeLeft=60;
     let renderZones=[];
+    let insects = [];
     let xZones=[];
     let xHit=0;
     let finalScore=0;
@@ -169,6 +171,13 @@
     };
     blue.src = 'assets/blue.jpeg';
 
+    let insect = new Image();
+    insect.isReady = false;
+    insect.onload = function() {
+        this.isReady = true;
+    };
+    insect.src = 'assets/insect.png';
+
 
     let carCrash = ParticleSystem(Graphics, {
         image: singleFrog,
@@ -252,6 +261,14 @@
         this.y=y;
     }
 
+    function insectShell(x,y){
+        this.img = insect;
+        this.length=canvas.width/MAPSIZE/2;
+        this.x=x;
+        this.y=y;
+        this.time=10;
+    }
+
     function createBox(spec) {
         spec.center = {
             x: spec.left + spec.width / 2,
@@ -260,7 +277,35 @@
         spec.orientation = 0;
         return spec;
     }
+    function renderInsects() {
+        for (let i=0;i<insects.length;i++){
+            context.drawImage(insects[i].img,
+                insects[i].x, insects[i].y,
+                insects[i].length, canvas.height/MAPSIZE/2);
+        }
+    }
 
+    function updateInsects(){
+        if (insects.length===0){
+            let rand = Random.nextRange(1,500);
+            if (performance.now()%15000<18){
+                rand=Random.nextRange(0,landingZones.length);
+                let newInsect=new insectShell(landingZones[rand]-(canvas.width/MAPSIZE/4),canvas.height/MAPSIZE/4);
+                insects.push(newInsect);
+            }
+
+        }else{
+            if (performance.now()%1000<18){
+
+
+                if (insects[0].time<=0){
+                    insects.pop();
+                }else {
+                    insects[0].time--;
+                }
+            }
+        }
+    }
 
     function checkCarCollisions(){
         for (let i=0;i<cars.length;i++){
@@ -674,7 +719,7 @@
         }
         timer = performance.now()%3000;
         if (timer>0&&timer<15) {
-            let rand = Random.nextRange(1,5)
+            let rand = Random.nextRange(1,8)
             if (rand===1){
                 let center = {
                     x: -95,
@@ -836,6 +881,12 @@
             let found=false;
             for (let i=0;i<landingZones.length;i++){
                 if (Math.abs(frog.center.x-landingZones[i])<canvas.width/MAPSIZE/1.9){
+                    if(insects.length>0) {
+                        if (Math.abs(frog.center.x - insects[0].x) < canvas.width / MAPSIZE / 1.9) {
+                            insects.pop();
+                            finalScore += 200;
+                        }
+                    }
                     victory.play();
                     xHit=landingZones[i];
                     celebration.update2(frog);
@@ -898,6 +949,7 @@
         checkTurtleCollsions(elapsedTime);
         checkAlligatorCollsions(elapsedTime);
         checkLogCollisions(elapsedTime);
+        updateInsects();
         updateCar(elapsedTime);
         updateLogs(elapsedTime);
         updateTurtles(elapsedTime);
@@ -916,6 +968,7 @@
         renderTurtles();
         renderLogs();
         renderInfoBar();
+        renderInsects();
         renderBox(timeBar);
         frogRender.render(frog);
         carCrash.render();
@@ -977,12 +1030,14 @@
                     frog.rotation=-Math.PI/2;
                     break;
                 case 40: //down
-                    // if (frog.direction!=1) {
+                    console.log(frog.center.y+canvas.height/MAPSIZE);
+                    console.log(canvas.height -(canvas.height/MAPSIZE/2));
+                    if(!(frog.center.y>=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2))) {
                         frog.verticalMovementToGo += canvas.height / MAPSIZE;
-                    // }
-                    frog.rotation=0;
-                    frogRender.setIndex(1);
-                    frog.direction=2;
+                        frog.rotation = 0;
+                        frogRender.setIndex(1);
+                        frog.direction = 2;
+                    }
                     break;
                 default:
                     console.log(code);
@@ -1014,12 +1069,12 @@
                 frog.rotation = -Math.PI / 2;
             }
                 else if (e.key===downKey) { //down
-                // if (frog.direction!=1) {
-                frog.verticalMovementToGo += canvas.height / MAPSIZE;
-                // }
-                frog.rotation = 0;
-                frogRender.setIndex(1);
-                frog.direction = 2;
+                if(!(frog.center.y>=canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2))) {
+                    frog.verticalMovementToGo += canvas.height / MAPSIZE;
+                    frog.rotation = 0;
+                    frogRender.setIndex(1);
+                    frog.direction = 2;
+                }
             }
             }
         }
@@ -1044,6 +1099,7 @@
                     if (col===1||col===4||col===7||col===10||col===13) {
                         if (!done&&xZones.length<5){
                             xZones.push(col*canvas.width);
+                            xZonesClone.push(col*canvas.width);
                             if (xZones.length>=5){
                                 done=true;
                             }
@@ -1069,6 +1125,7 @@
 
     function initialize() {
         music.play();
+        music.loop=true;
         coin.play();
         landingZones.push(60);
         landingZones.push(180);
