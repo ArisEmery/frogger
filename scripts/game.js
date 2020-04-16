@@ -1005,6 +1005,8 @@
     function onKeyDownDefault(e) {
         // var code = e;
         if(!gameOver&&gameReady) {
+            hop = new Audio("assets/hop.wav");
+            hop.play();
             switch (e.keyCode) {
                 case 37: //left
                     frog.direction=3;
@@ -1013,8 +1015,6 @@
                     frog.rotation=Math.PI/2;
                     break;
                 case 38: //up
-                    hop = new Audio("assets/hop.wav");
-                    hop.play();
                     frog.verticalMovementToGo -= canvas.height / MAPSIZE;
                     frog.direction=1;
                     frogRender.setIndex(1);
@@ -1047,14 +1047,14 @@
 
     function onKeyDown(e) {
         if(!gameOver&&gameReady) {
+            hop = new Audio("assets/hop.wav");
+            hop.play();
             if (e.key === leftKey) { //left
                 frog.direction = 3;
                 frogRender.setIndex(1);
                 frog.horizontalMovementToGo -= canvas.height / MAPSIZE
                 frog.rotation = Math.PI / 2;
             } else if (e.key === upKey) { //up
-                hop = new Audio("assets/hop.wav");
-                hop.play();
                 frog.verticalMovementToGo -= canvas.height / MAPSIZE;
                 frog.direction = 1;
                 frogRender.setIndex(1);
