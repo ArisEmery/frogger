@@ -3,9 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="454c5188-4c7a-4f44-86b5-b80768e752de" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/game.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/render/animated-model.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/render/animated-model.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/render/core.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/render/core.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controls.html" beforeDir="false" afterPath="$PROJECT_DIR$/controls.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scores.html" beforeDir="false" afterPath="$PROJECT_DIR$/scores.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +73,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1586911343696</updated>
-      <workItem from="1586911345143" duration="78402000" />
+      <workItem from="1586911345143" duration="81052000" />
     </task>
     <servers />
   </component>
