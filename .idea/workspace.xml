@@ -3,11 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="454c5188-4c7a-4f44-86b5-b80768e752de" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controls.html" beforeDir="false" afterPath="$PROJECT_DIR$/controls.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scores.html" beforeDir="false" afterPath="$PROJECT_DIR$/scores.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/game.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +69,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1586911343696</updated>
-      <workItem from="1586911345143" duration="81052000" />
+      <workItem from="1586911345143" duration="82749000" />
     </task>
     <servers />
   </component>
@@ -85,11 +81,11 @@
       <screen x="0" y="23" width="1280" height="716" />
     </state>
     <state x="246" y="63" key="#Notifications/0.23.1280.716@0.23.1280.716" timestamp="1586961213348" />
-    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1586927883943">
+    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1587009398221">
       <screen x="0" y="23" width="1280" height="715" />
     </state>
     <state x="622" y="214" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1280.713@0.23.1280.713" timestamp="1586919400794" />
-    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1280.715@0.23.1280.715" timestamp="1586927883943" />
+    <state x="622" y="215" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1280.715@0.23.1280.715" timestamp="1587009398221" />
     <state width="1239" height="204" key="GridCell.Tab.0.bottom" timestamp="1586971182112">
       <screen x="0" y="23" width="1280" height="721" />
     </state>
@@ -144,7 +140,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/scripts/game.js</url>
-          <line>876</line>
+          <line>886</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
         </line-breakpoint>

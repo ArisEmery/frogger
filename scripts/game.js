@@ -31,6 +31,12 @@
     let leftKey=localStorage.getItem('leftKey');
     let rightKey=localStorage.getItem('rightKey');
     let downKey=localStorage.getItem('downKey');
+    let music = new Audio("assets/music.wav");
+    let squash = new Audio("assets/squash.wav");
+    let plunk = new Audio("assets/plunk.wav");
+    let victory = new Audio("assets/victory.wav");
+    let hop = new Audio("assets/hop.wav");
+    let coin = new Audio("assets/coin.wav");
     let furthestPointReached= canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2);
     window.addEventListener('keydown', onKeyDownDefault);
     window.addEventListener('keydown', onKeyDown);
@@ -265,6 +271,7 @@
                 let carCollionX=5+cars[i].x+(cars[i].length/2);
                 if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
                     carCrash.update3(frog);
+                    squash.play();
                     handleCollisions();
                 }
 
@@ -293,6 +300,7 @@
                 }
                 if (frog.swimTime<0){
                     splash.update3(frog);
+                    plunk.play();
                     handleCollisions();
                 }
 
@@ -318,6 +326,7 @@
                 }
                 if (frog.swimTime < 0) {
                     splash.update3(frog);
+                    plunk.play();
                     handleCollisions();
                 }
             }
@@ -338,6 +347,7 @@
                 }
                 if (frog.swimTime<0){
                     splash.update3(frog);
+                    plunk.play();
                     handleCollisions();
                 }
             }
@@ -826,6 +836,7 @@
             let found=false;
             for (let i=0;i<landingZones.length;i++){
                 if (Math.abs(frog.center.x-landingZones[i])<canvas.width/MAPSIZE/1.9){
+                    victory.play();
                     xHit=landingZones[i];
                     celebration.update2(frog);
                     finalScore+=50;
@@ -841,6 +852,7 @@
                 }
             }
             if (!found){
+                squash.play();
                 handleCollisions();
             }
         }
@@ -948,6 +960,8 @@
                     frog.rotation=Math.PI/2;
                     break;
                 case 38: //up
+                    hop = new Audio("assets/hop.wav");
+                    hop.play();
                     frog.verticalMovementToGo -= canvas.height / MAPSIZE;
                     frog.direction=1;
                     frogRender.setIndex(1);
@@ -984,6 +998,8 @@
                 frog.horizontalMovementToGo -= canvas.height / MAPSIZE
                 frog.rotation = Math.PI / 2;
             } else if (e.key === upKey) { //up
+                hop = new Audio("assets/hop.wav");
+                hop.play();
                 frog.verticalMovementToGo -= canvas.height / MAPSIZE;
                 frog.direction = 1;
                 frogRender.setIndex(1);
@@ -1045,12 +1061,15 @@
         }
     }
     function handleGameOver() {
+        music.pause();
         context.font="50px Arial";
         context.fillStyle = "white";
         context.fillText("Game Over...", 150, (canvas.height/2)-25);
     }
 
     function initialize() {
+        music.play();
+        coin.play();
         landingZones.push(60);
         landingZones.push(180);
         landingZones.push(300);
