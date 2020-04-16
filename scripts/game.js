@@ -23,6 +23,7 @@
     let timeLeft=60;
     let renderZones=[];
     let xZones=[];
+    let xHit=0;
     let finalScore=0;
     let upKey=localStorage.getItem('upKey');
     let leftKey=localStorage.getItem('leftKey');
@@ -139,6 +140,53 @@
     };
     largeLog.src = 'assets/large-log.png';
 
+    let white = new Image();
+    white.isReady = false;
+    white.onload = function() {
+        this.isReady = true;
+    };
+    white.src = 'assets/white.jpg';
+
+    let redImg = new Image();
+    redImg.isReady = false;
+    redImg.onload = function() {
+        this.isReady = true;
+    };
+    redImg.src = 'assets/red.png';
+
+    let blue = new Image();
+    blue.isReady = false;
+    blue.onload = function() {
+        this.isReady = true;
+    };
+    blue.src = 'assets/blue.jpeg';
+
+    let carCrash = ParticleSystem(Graphics, {
+        image: singleFrog,
+        image2: imgRoad,
+        width: Graphics.width*2,
+        size: {mean: 5, stdev: .5},
+        speed: { mean: .03, stdev: 0.1},
+        lifetime: { mean: 150, stdev: 50}
+    });
+    let splash = ParticleSystem(Graphics, {
+        image: imgWater,
+        image2: white,
+        width: Graphics.width*2,
+        size: {mean: 5, stdev: .5},
+        speed: { mean: .03, stdev: 0.1},
+        lifetime: { mean: 150, stdev: 50}
+    });
+
+    let celebration = ParticleSystem(Graphics, {
+        image: redImg,
+        image2: blue,
+        width: Graphics.width*2,
+        size: {mean: 5, stdev: .5},
+        speed: { mean: .01, stdev: 0.03},
+        lifetime: { mean: 1000, stdev: 300}
+    });
+
     let frog = {
         size: { x: canvas.width/MAPSIZE, y: canvas.height/MAPSIZE },     //size of cropped image
         center: { x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)},
@@ -195,7 +243,7 @@
         return spec;
     }
 
-   //todo every few second pop the last few car off the list (as many as spawn in those seconds)
+
     function checkCarCollisions(){
         for (let i=0;i<cars.length;i++){
             //TODO make this only work on the road to optimize
@@ -204,7 +252,7 @@
                 let minimumDistance=frog.radius+theirRadius-10;
                 let carCollionX=5+cars[i].x+(cars[i].length/2);
                 if (Math.abs(frog.center.x-carCollionX)<minimumDistance){
-                    console.log("collision detected");
+                    carCrash.update3(frog);
                     handleCollisions();
                 }
 
@@ -232,6 +280,7 @@
                     frog.swimTime-=elapsedTime;
                 }
                 if (frog.swimTime<0){
+                    splash.update3(frog);
                     handleCollisions();
                 }
 
@@ -252,6 +301,7 @@
                     frog.swimTime-=elapsedTime;
                 }
                 if (frog.swimTime<0){
+                    splash.update3(frog);
                     handleCollisions();
                 }
             }
@@ -684,7 +734,6 @@
         let highScore3=localStorage.getItem('froggerHighScore3');
         let highScore4=localStorage.getItem('froggerHighScore4');
         let highScore5=localStorage.getItem('froggerHighScore5');
-        console.log("were here");
         scores.push(finalScore);
         scores.push(highScore1);
         scores.push(highScore2);
@@ -699,8 +748,6 @@
         window.localStorage.setItem('froggerHighScore3', scores[2]);
         window.localStorage.setItem('froggerHighScore4', scores[3]);
         window.localStorage.setItem('froggerHighScore5', scores[4]);
-        console.log("And here too");
-
     }
 
     function checkWin(){
@@ -714,13 +761,14 @@
             let found=false;
             for (let i=0;i<landingZones.length;i++){
                 if (Math.abs(frog.center.x-landingZones[i])<canvas.width/MAPSIZE/1.9){
+                    xHit=landingZones[i];
+                    celebration.update2(frog);
                     finalScore+=50;
                     found=true;
                     popped=true;
                     renderZones.push(xZones[i]);
                     landingZones.splice(i,1);
                     xZones.splice(i,1);
-                    console.log(renderZones);
                     frog.verticalMovementToGo=0;
                     timeLeft=60;
                     frog.center={ x: (canvas.width/2), y:canvas.height-(canvas.height/MAPSIZE*2) -(canvas.height/MAPSIZE/2)}
@@ -769,22 +817,19 @@
             frog.horizontalMovementToGo-=verticalMovement;
         }
         ////TODO put all this ^^ in its own thing
-        // checkCarCollisions();
-        // checkTurtleCollsions(elapsedTime);
-        // checkLogCollisions(elapsedTime);
+        checkCarCollisions();
+        checkTurtleCollsions(elapsedTime);
+        checkLogCollisions(elapsedTime);
         updateCar(elapsedTime);
         updateLogs(elapsedTime);
         updateTurtles(elapsedTime);
+        carCrash.update(elapsedTime);
+        celebration.update(elapsedTime);
+        splash.update(elapsedTime);
         checkWin();
 
     }
 
-
-    //------------------------------------------------------------------
-    //
-    // Render the particles
-    //
-    //------------------------------------------------------------------
     function render() {
         graphics.clear();
         renderMaze();
@@ -795,6 +840,9 @@
         renderInfoBar();
         renderBox(timeBar);
         frogRender.render(frog);
+        carCrash.render();
+        celebration.renderHome(MAPSIZE,xHit);
+        splash.render();
 
 
     }
@@ -838,8 +886,6 @@
                     frog.direction=1;
                     frogRender.setIndex(1);
                     frog.rotation=Math.PI;
-                    console.log(furthestPointReached);
-                    console.log(frog.center.y-canvas.height/MAPSIZE);
                     if(frog.center.y-canvas.height/MAPSIZE<furthestPointReached){
                         finalScore+=10;
                     }
@@ -876,8 +922,6 @@
                 frog.direction = 1;
                 frogRender.setIndex(1);
                 frog.rotation = Math.PI;
-                console.log(furthestPointReached);
-                console.log(frog.center.y - canvas.height / MAPSIZE);
                 if (frog.center.y - canvas.height / MAPSIZE < furthestPointReached) {
                     finalScore += 10;
                 }
